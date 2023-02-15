@@ -1,14 +1,11 @@
-import React, { useState } from 'react'
-import './App.css'
-import axios from 'axios';
+import React from "react";
 
 function App() {
-  
   return (
     <div className="App">
       <h1>Admin</h1>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
