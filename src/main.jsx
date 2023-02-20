@@ -1,7 +1,7 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import './index.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
 
 //React-router-dom
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -10,7 +10,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Overview from "./pages/Overview/Overview";
 import Posts from "./pages/Posts/Posts";
-import ErrorPage from './pages/ErrorPage/ErrorPage';
+import ErrorPage from "./pages/ErrorPage/ErrorPage";
 
 //React-helmet-async
 import { HelmetProvider } from "react-helmet-async";
