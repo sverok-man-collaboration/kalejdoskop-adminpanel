@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import { FiMenu } from "react-icons/fi";
@@ -93,11 +93,13 @@ function Menu() {
           <motion.div
             variants={childVariants}
             key="logoutButton"
-            className="mb-6 mt-auto mx-auto w-2/3"
+            className="mb-6 mt-auto mx-auto w-40"
           >
-            <button className="transform bg-accent transition duration-500 rounded-md text-white p-2 hover:bg-accent Hover w-full">
-              Logga ut
-            </button>
+            <Link to="/" className="w-full">
+              <button className=" w-full transform bg-accent transition duration-500 rounded-md text-white p-2 hover:bg-accentHover">
+                Logga ut
+              </button>
+            </Link>
           </motion.div>
         </motion.nav>
       </div>
@@ -118,9 +120,11 @@ function Menu() {
           <div className="h-px w-11/12 mx-2 bg-gradient-to-r from-accent to-primary"></div>
         </NavLink>
 
-        <button className="transform bg-accent transition duration-500 rounded-md mt-10 text-white p-2 m-4 hover:bg-accentHover mb-4 mt-auto">
-          Logga ut
-        </button>
+        <Link to="/" className="mb-4 mt-auto mx-auto w-40">
+          <button className=" w-full transform bg-accent transition duration-500 rounded-md text-white p-2 hover:bg-accentHover">
+            Logga ut
+          </button>
+        </Link>
       </nav>
     </div>
   );
