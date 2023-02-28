@@ -1,5 +1,13 @@
-/** @type {import('tailwindcss').Config} */
-
+/**
+ * The default theme for Tailwind CSS.
+ * @property {object} screens
+ * @property {string} screens.sm
+ * @property {string} screens.md
+ * @property {string} screens.lg
+ * @property {string} screens.xl
+ * @property {string} screens.2xl
+ * @see {@link https://tailwindcss.com/docs/theme Tailwind CSS theme documentation}
+ */
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
