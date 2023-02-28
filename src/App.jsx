@@ -3,10 +3,11 @@ import BarLoader from "react-spinners/BarLoader";
 import { Outlet, useNavigation } from "react-router-dom";
 
 function App() {
-const navigation = useNavigation()
+  const navigation = useNavigation();
 
-if (navigation.state === "loading") {
-  return <BarLoader />}
+  if (navigation.state === "loading") {
+    return <BarLoader />;
+  }
 
   return (
     <div className="App">
