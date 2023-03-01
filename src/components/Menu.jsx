@@ -48,8 +48,11 @@ function Menu() {
   };
 
   return (
-    <div>
-      <div id="MenuSmall" className="inline-block md:hidden h-screen z-50">
+    <div className="relative">
+      <div
+        id="MenuSmall"
+        className="inline-block md:hidden h-screen z-50 fixed top-0 left-0"
+      >
         <motion.nav
           initial={{ clipPath: "circle(24px at 30px 30px)" }}
           className="h-screen flex flex-col w-48 bg-primary text-white pt-2 pb-2"
@@ -104,7 +107,7 @@ function Menu() {
         </motion.nav>
       </div>
 
-      <nav className="hidden md:flex flex-col w-48 bg-primary h-screen text-white pt-2 pb-2 z-50">
+      <nav className="hidden md:flex flex-col w-48 bg-primary h-screen text-white pt-2 pb-2 z-50 fixed top-0 left-0">
         <NavLink
           to="/overview"
           style={({ isActive }) => (isActive ? active : undefined)}
