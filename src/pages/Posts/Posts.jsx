@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { BiEdit, BiXCircle } from "react-icons/Bi";
-import { IoMdCheckmarkCircleOutline } from "react-icons/Io";
+import { BiEdit, BiXCircle } from "react-icons/bi";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import {
   MdOutlineDoNotDisturbAlt,
   MdOutlineLocalPostOffice,
