@@ -83,9 +83,9 @@ function Menu() {
             </NavLink>
           </motion.div>
 
-          <motion.div variants={childVariants} key="posts">
+          <motion.div variants={childVariants} key="messages">
             <NavLink
-              to="/posts"
+              to="/messages"
               style={({ isActive }) => (isActive ? active : undefined)}
             >
               <p className="py-4 mx-2">INLÄGG</p>
@@ -116,7 +116,7 @@ function Menu() {
           <div className="h-px w-11/12 mx-2 bg-gradient-to-r from-accent to-primary"></div>
         </NavLink>
         <NavLink
-          to="/posts"
+          to="/messages"
           style={({ isActive }) => (isActive ? active : undefined)}
         >
           <p className="py-4 mx-2">INLÄGG</p>
