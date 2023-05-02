@@ -1,8 +1,40 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 
 function Login() {
   const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const clientToken = urlParams.get("token");
+
+      if (!clientToken) {
+        console.error("Client token not provided");
+        return;
+      }
+
+      console.log(clientToken);
+    };
+
+    fetchToken();
+  }, []);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const clientToken = urlParams.get("clientToken");
+  console.log(clientToken);
+
+  async function loginRequest(email) {
+    try {
+      const response = await axios.post("http://localhost:4000/", {
+        email: email,
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   function handleChange(e) {
     setEmail(e.target.value);
@@ -10,6 +42,7 @@ function Login() {
 
   function handleSubmit(e) {
     e.preventDefault();
+    loginRequest(email);
     setEmail("");
   }
 
@@ -35,7 +68,7 @@ function Login() {
               <button
                 disabled={!email}
                 type="submit"
-                onSubmit={handleSubmit}
+                onClick={handleSubmit}
                 className="transform bg-accent transition duration-500 rounded-md mt-10 text-white p-2 hover:bg-accentHover mb-4"
               >
                 Logga in
