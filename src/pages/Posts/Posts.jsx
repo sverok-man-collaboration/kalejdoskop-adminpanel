@@ -15,7 +15,6 @@ function Posts() {
   const [showApprove, setShowApprove] = useState(false);
   const [showDeny, setShowDeny] = useState(false);
   const [editing, setEditing] = useState(false);
-
   const [messages, setMessages] = useState([]);
   const [pendingMessages, setPendingMessages] = useState(getFilteredmessages);
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -74,12 +73,12 @@ function Posts() {
   }
 
   // efter att en har ångrat status så ändras det tillbaka i databasen men inte på meddelandet som öppnas.
-  // flytta på stänga-modal-knappen på statuschange-modalen.
-  // selecten är konstig
 
-  // kan man ta emot edited text med patch funktionen i controller?
+  // selecten är konstig.
 
-  // ska vi ha med room och object i adminpanelen också i meddelande modalen?
+  // kan man ta emot edited text med patch funktionen i controller? fixas i veckan
+
+  // ska vi ha med room och object i adminpanelen också i meddelande modalen? avvakta med detta
 
   function handleFilter(e) {
     setFilter(e.target.value);
@@ -142,66 +141,15 @@ function Posts() {
     console.log(newMessage);
   }
 
-  /*function handleApprove() {
-    setMessages(
-      messages.map((message) => {
-        if (message.id === selectedMessage.id) {
-          return { ...message, status: "approved" };
-        }
-        return message;
-      })
-    );
-    confetti({
-      particleCount: 10,
-      shapes: ["star"],
-      spread: 360,
-      startVelocity: 25,
-    });
-    closeModal();
-    setShowApprove(true);
-  }
-
-  function handleDeny() {
-    setMessages(
-      messages.map((message) => {
-        if (message.id === selectedMessage.id) {
-          return { ...message, status: "denied" };
-        }
-        return message;
-      })
-    );
-    confetti({
-      particleCount: 10,
-      shapes: ["star"],
-      spread: 360,
-      startVelocity: 25,
-    });
-    closeModal();
-    setShowDeny(true);
-  }
-    function handleRegretStatus() {
-    setSelectedMessage(previousMessage);
-    setMessages(
-      messages.map((message) => {
-        if (message.id === selectedMessage.id) {
-          message.status = previousMessage.status;
-        }
-        return message;
-      })
-    );
-    openModal(selectedMessage.id);
-  }
-*/
-
   async function handleRegretStatus() {
-    setSelectedMessage(previousMessage);
     try {
+      setSelectedMessage(previousMessage);
       await axios.patch("http://localhost:4000/messages", previousMessage);
-      openModal(selectedMessage.id);
+      getMessages();
     } catch (err) {
       console.log(err);
     }
-    getMessages();
+    openModal(selectedMessage.id);
   }
 
   function handleTitle() {
@@ -287,7 +235,7 @@ function Posts() {
       <Menu />
       <div className="flex flex-row max-h-screen xs:mx-[20px] md:ml-[194px] overflow-auto">
         <div className="flex w-[100%] md:w-1/2 flex-col mt-20 items-center max-h-full">
-          <form>
+          <form className="max-w-[100%]">
             <select
               onChange={handleFilter}
               value={filter}
@@ -449,11 +397,12 @@ function Posts() {
           ) : null}
           {showApprove ? (
             <div className="mt-20 fixed top-0 left-0 bottom-0 right-0 z-50 bg-white md:relative">
-              <div className="flex justify-end"></div>
-              <BiXCircle
-                className="cursor-pointer ml-3"
-                onClick={closeChangedStatusModal}
-              />
+              <div className="flex justify-end mr-8">
+                <BiXCircle
+                  className="cursor-pointer ml-3"
+                  onClick={closeChangedStatusModal}
+                />
+              </div>
               <div className="flex items-center justify-center flex-col">
                 <p className="mb-10 text-lg ml-2">
                   Inlägget har <span className="text-[#02CC3B]">godkänts</span>
@@ -481,11 +430,12 @@ function Posts() {
           ) : null}
           {showDeny ? (
             <div className="mt-20 fixed top-0 left-0 bottom-0 right-0 z-50 bg-white md:relative ">
-              {" "}
-              <BiXCircle
-                className="cursor-pointer ml-3"
-                onClick={closeChangedStatusModal}
-              />
+              <div className="flex justify-end mr-8">
+                <BiXCircle
+                  className="cursor-pointer ml-3"
+                  onClick={closeChangedStatusModal}
+                />
+              </div>
               <div className="flex items-center justify-center flex-col">
                 <p className="mb-10 text-lg">
                   Inlägget har <span className="text-[#FF1C1C]">nekats</span>
