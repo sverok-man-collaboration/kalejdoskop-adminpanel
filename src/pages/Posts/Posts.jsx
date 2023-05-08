@@ -23,8 +23,8 @@ function Posts() {
   const [editedText, setEditedText] = useState("");
 
   //axios
-  function getMessages() {
-    axios
+  async function getMessages() {
+    await axios
       .get("http://localhost:4000/messages")
       .then((res) => {
         setMessages(res.data);
@@ -35,7 +35,7 @@ function Posts() {
     getMessages();
   }, []);
 
-  async function patchMessageText(message) {
+  /*async function patchMessageText(message) {
     const newMessage = {
       id: message.id,
       message: editedText,
@@ -46,17 +46,15 @@ function Posts() {
     } catch (err) {
       console.log(err);
     }
-  }
+  }*/
 
   function openModal(messageId) {
     const message = messages.find((message) => message.id === messageId);
-    if (!message) {
-      return;
-    }
+
     setShowApprove(false);
     setShowDeny(false);
     setSelectedMessage(message);
-    setPreviousMessage(message);
+
     setShowMessage(true);
   }
 
@@ -64,19 +62,12 @@ function Posts() {
     setShowMessage(false);
     setEditing(false);
     setEditedText("");
-    //setSelectedMessage(null);
   }
 
   function closeChangedStatusModal() {
     setShowApprove(false);
     setShowDeny(false);
   }
-
-  // efter att en har ångrat status så ändras det tillbaka i databasen men inte på meddelandet som öppnas.
-
-  // selecten är konstig.
-
-  // kan man ta emot edited text med patch funktionen i controller? fixas i veckan
 
   // ska vi ha med room och object i adminpanelen också i meddelande modalen? avvakta med detta
 
@@ -113,10 +104,11 @@ function Posts() {
       });
       closeModal();
       setShowApprove(true);
+      setPreviousMessage(message);
     } catch (err) {
       console.log(err);
     }
-    console.log(newMessage);
+    setPendingMessages(getFilteredmessages());
   }
 
   async function handleDeny(message) {
@@ -135,21 +127,38 @@ function Posts() {
       });
       closeModal();
       setShowDeny(true);
+      setPreviousMessage(message);
     } catch (err) {
       console.log(err);
     }
-    console.log(newMessage);
+    setPendingMessages(getFilteredmessages());
   }
+
+  //overflow auto till overflow y aouto 236
 
   async function handleRegretStatus() {
     try {
-      setSelectedMessage(previousMessage);
       await axios.patch("http://localhost:4000/messages", previousMessage);
       getMessages();
+      setSelectedMessage(previousMessage);
     } catch (err) {
       console.log(err);
     }
-    openModal(selectedMessage.id);
+  }
+
+  function openRegretedModal() {
+    setShowApprove(false);
+    setShowDeny(false);
+    setShowMessage(true);
+  }
+
+  function startRegret() {
+    handleRegretStatus();
+    const message = messages.find(
+      (message) => message.id === previousMessage.id
+    );
+    openRegretedModal(message.id);
+    setSelectedMessage(message);
   }
 
   function handleTitle() {
@@ -233,9 +242,9 @@ function Posts() {
         <title>Beskrivande text</title>
       </Helmet>
       <Menu />
-      <div className="flex flex-row max-h-screen xs:mx-[20px] md:ml-[194px] overflow-auto">
-        <div className="flex w-[100%] md:w-1/2 flex-col mt-20 items-center max-h-full">
-          <form className="max-w-[100%]">
+      <div className="flex flex-row h-screen xs:mx-[20px] md:ml-[194px]">
+        <div className="flex w-[100%] md:w-1/2 flex-col items-center h-full">
+          <form className="mt-20 max-w-[100%]">
             <select
               onChange={handleFilter}
               value={filter}
@@ -249,9 +258,9 @@ function Posts() {
               <option value="pending">Obesvarade inlägg</option>
             </select>
           </form>
-          <div className="w-[100%] max-h-full ">
+          <div className="w-[100%] h-full overflow-hidden">
             {handleTitle()}
-            <ul className="overflow-y-auto touch-auto max-h-full h-[96%] w-[100%]">
+            <ul className="overflow-y-auto touch-auto h-[90%] w-[100%]">
               {filteredMessages()
                 .filter((message) => message.status === "all")
                 .map((message) => (
@@ -323,7 +332,7 @@ function Posts() {
           </div>
         </div>
 
-        <div className=" md:pt-[90px] md:max-h-full overflow-y-auto">
+        <div className=" md:pt-[90px] md:h-full overflow-y-auto">
           {showMessage ? (
             <div className="fixed top-0 left-0 bottom-0 right-0 z-50 bg-white md:relative ">
               <div className="flex justify-end m-4 text-xl">
@@ -409,7 +418,7 @@ function Posts() {
                 </p>
                 <div>
                   <button
-                    onClick={handleRegretStatus}
+                    onClick={startRegret}
                     className="rounded-3xl bg-grey text-black py-2 px-8"
                   >
                     Ångra
@@ -442,7 +451,7 @@ function Posts() {
                 </p>
                 <div>
                   <button
-                    onClick={handleRegretStatus}
+                    onClick={startRegret}
                     className="rounded-3xl bg-grey text-black py-2 px-8"
                   >
                     Ångra
