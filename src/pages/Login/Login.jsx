@@ -1,36 +1,39 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
+  const [loginStatus, setLoginStatus] = useState(0);
+  const [loginResponse, setLoginResponse] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchToken = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const clientToken = urlParams.get("token");
 
-      if (!clientToken) {
+      if (!clientToken && loginStatus === 200) {
         console.error("Client token not provided");
+        setLoginResponse("Try again");
         return;
+      } else if (clientToken) {
+        localStorage.setItem("token", JSON.stringify(clientToken));
+        navigate("/overview");
       }
-
-      console.log(clientToken);
     };
 
     fetchToken();
   }, []);
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const clientToken = urlParams.get("clientToken");
-  console.log(clientToken);
-
   async function loginRequest(email) {
     try {
-      const response = await axios.post("http://localhost:4000/", {
+      const response = await axios.post("http://localhost:4000/login/auth", {
         email: email,
       });
-      console.log(response);
+      setLoginStatus(response.status);
+      setLoginResponse(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -54,31 +57,41 @@ function Login() {
 
       <div className="flex  min-h-screen w-full flex-row">
         <div className="flex flex-col justify-center items-center w-full">
-          <section className="h-300 flex flex-col p-20 w-full max-w-md">
-            <h2 className="text-xl mb-10">Projekt namn</h2>
-            <form className="flex flex-col max-w-md">
-              <label className="text-xs after:content-['*'] mb-2">Email </label>
-              <input
-                type="email"
-                onChange={handleChange}
-                value={email}
-                className="border-b border-primary sm:text-sm p-2 "
-                placeholder="email@example.se"
-              />
-              <button
-                disabled={!email}
-                type="submit"
-                onClick={handleSubmit}
-                className="transform bg-accent transition duration-500 rounded-md mt-10 text-white p-2 hover:bg-accentHover mb-4"
-              >
-                Logga in
-              </button>
-            </form>
-            <small>
-              Skriv in din e-mail address och klicka sen på verifieringslänken
-              för att logga in.
-            </small>
-          </section>
+          {loginStatus !== 200 || loginResponse === "Try again" ? (
+            <section className="h-300 flex flex-col p-20 w-full max-w-md">
+              <h2 className="text-xl mb-10">Projekt namn</h2>
+              <form className="flex flex-col max-w-md">
+                <label className="text-xs after:content-['*'] mb-2">
+                  Email{" "}
+                </label>
+                <input
+                  type="email"
+                  onChange={handleChange}
+                  value={email}
+                  className="border-b border-primary sm:text-sm p-2 "
+                  placeholder="email@example.se"
+                />
+                <button
+                  disabled={!email}
+                  type="submit"
+                  onClick={handleSubmit}
+                  className="transform bg-accent transition duration-500 rounded-md mt-10 text-white p-2 hover:bg-accentHover mb-4"
+                >
+                  Logga in
+                </button>
+              </form>
+              {loginResponse === "Try again" ? (
+                <small>Något gick fel försök igen.</small>
+              ) : (
+                <small>
+                  Skriv in din e-mail address och klicka sen på
+                  verifieringslänken för att logga in.
+                </small>
+              )}
+            </section>
+          ) : (
+            <h1>{loginResponse}</h1>
+          )}
         </div>
 
         <section className="flex hidden lg:flex bg-primary flex-col w-full justify-center items-center relative">
