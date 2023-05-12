@@ -19,7 +19,7 @@ function Login() {
         setLoginResponse("Try again");
         return;
       } else if (clientToken) {
-        localStorage.setItem("token", JSON.stringify(clientToken));
+        sessionStorage.setItem("token", JSON.stringify(clientToken));
         navigate("/overview");
       }
     };
