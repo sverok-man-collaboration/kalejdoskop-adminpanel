@@ -127,12 +127,11 @@ function Menu() {
           <div className="h-px w-11/12 mx-2 bg-gradient-to-r from-accent to-primary"></div>
         </NavLink>
 
-        <Link
-          to="/"
-          className="mb-4 mt-auto mx-auto w-40"
-          onClick={removeToken}
-        >
-          <button className=" w-full transform bg-accent transition duration-500 rounded-md text-white p-2 hover:bg-accentHover">
+        <Link to="/" className="mb-4 mt-auto mx-auto w-40">
+          <button
+            onClick={removeToken}
+            className=" w-full transform bg-accent transition duration-500 rounded-md text-white p-2 hover:bg-accentHover"
+          >
             Logga ut
           </button>
         </Link>
