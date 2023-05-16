@@ -10,7 +10,7 @@ import Menu from "../../components/Menu";
 import confetti from "canvas-confetti";
 import axios from "axios";
 
-function Posts() {
+function Messages() {
   const [showMessage, setShowMessage] = useState(false);
   const [showApprove, setShowApprove] = useState(false);
   const [showDeny, setShowDeny] = useState(false);
@@ -475,4 +475,4 @@ function Posts() {
     </div>
   );
 }
-export default Posts;
+export default Messages;
