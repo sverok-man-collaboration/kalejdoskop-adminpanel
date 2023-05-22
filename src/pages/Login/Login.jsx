@@ -9,21 +9,20 @@ function Login() {
   const [loginResponse, setLoginResponse] = useState("");
   const navigate = useNavigate();
 
+  async function fetchToken() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientToken = urlParams.get("token");
+
+    if (!clientToken && loginStatus === 200) {
+      console.error("Client token not provided");
+      setLoginResponse("Try again");
+      return;
+    } else if (clientToken) {
+      sessionStorage.setItem("token", clientToken);
+      navigate("/overview");
+    }
+  }
   useEffect(() => {
-    const fetchToken = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const clientToken = urlParams.get("token");
-
-      if (!clientToken && loginStatus === 200) {
-        console.error("Client token not provided");
-        setLoginResponse("Try again");
-        return;
-      } else if (clientToken) {
-        sessionStorage.setItem("token", JSON.stringify(clientToken));
-        navigate("/overview");
-      }
-    };
-
     fetchToken();
   }, []);
 
