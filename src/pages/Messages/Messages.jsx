@@ -24,10 +24,16 @@ function Messages() {
 
   //axios
   async function getMessages() {
+    const token = sessionStorage.getItem("token");
     await axios
-      .get("http://localhost:4000/messages")
+      .get("http://localhost:4000/messages", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
-        setMessages(res.data);
+        sessionStorage.setItem("token", res.data.newToken);
+        setMessages(res.data.messages);
       })
       .catch((err) => console.log(err));
   }
@@ -35,18 +41,22 @@ function Messages() {
     getMessages();
   }, []);
 
-  /*async function patchMessageText(message) {
+  async function patchMessage(message) {
+    const token = sessionStorage.getItem("token");
     const newMessage = {
       id: message.id,
       message: editedText,
     };
-    try {
-      await axios.patch("http://localhost:4000/messages", newMessage);
-      getMessages();
-    } catch (err) {
-      console.log(err);
-    }
-  }*/
+    await axios
+      .patch("http://localhost:4000/messages", newMessage, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        sessionStorage.setItem("token", res.data.newToken);
+        getMessages();
+      })
+      .catch((err) => console.log(err));
+  }
 
   function openModal(messageId) {
     const message = messages.find((message) => message.id === messageId);
@@ -89,25 +99,31 @@ function Messages() {
   }
 
   async function handleApprove(message) {
+    const token = sessionStorage.getItem("token");
     const newMessage = {
       id: message.id,
       status: "approved",
+      message: "",
     };
-    try {
-      await axios.patch("http://localhost:4000/messages", newMessage);
-      getMessages();
-      confetti({
-        particleCount: 10,
-        shapes: ["star"],
-        spread: 360,
-        startVelocity: 25,
-      });
-      closeModal();
-      setShowApprove(true);
-      setPreviousMessage(message);
-    } catch (err) {
-      console.log(err);
-    }
+    await axios
+      .patch("http://localhost:4000/messages", newMessage, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        sessionStorage.setItem("token", res.data.newToken);
+        getMessages();
+        confetti({
+          particleCount: 10,
+          shapes: ["star"],
+          spread: 360,
+          startVelocity: 25,
+        });
+        closeModal();
+        setShowApprove(true);
+        setPreviousMessage(message);
+      })
+      .catch((err) => console.log(err));
+
     setPendingMessages(getFilteredmessages());
   }
 
@@ -191,11 +207,11 @@ function Messages() {
 
   function handleStatus() {
     if (selectedMessage.status === "pending") {
-      return <p className="text-[#0827F5] ml-2 ">Ny</p>;
+      return <span className="text-[#0827F5] ml-2 ">Ny</span>;
     } else if (selectedMessage.status === "approved") {
-      return <p className="text-[#02CC3B] ml-2 ">Godkänd</p>;
+      return <span className="text-[#02CC3B] ml-2 ">Godkänd</span>;
     } else if (selectedMessage.status === "denied") {
-      return <p className="text-[#FF1C1C] ml-2 ">Nekad</p>;
+      return <span className="text-[#FF1C1C] ml-2 ">Nekad</span>;
     }
   }
 
