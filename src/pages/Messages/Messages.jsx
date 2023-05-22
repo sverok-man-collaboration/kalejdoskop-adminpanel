@@ -41,6 +41,7 @@ function Messages() {
     getMessages();
   }, []);
 
+  // currently not in use
   async function patchMessage(message) {
     const token = sessionStorage.getItem("token");
     const newMessage = {
