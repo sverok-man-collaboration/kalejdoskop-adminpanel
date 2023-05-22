@@ -10,6 +10,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Overview from "./pages/Overview/Overview";
 import Messages from "./pages/Messages/Messages";
+import Users from "./pages/Users/Users";
 import ErrorPage from "./pages/ErrorPage/ErrorPage";
 
 //React-helmet-async
@@ -34,6 +35,11 @@ const router = createBrowserRouter(
     {
       path: "messages",
       element: <Messages />,
+      errorElement: <ErrorPage />,
+    },
+    {
+      path: "users",
+      element: <Users />,
       errorElement: <ErrorPage />,
     },
   ])
