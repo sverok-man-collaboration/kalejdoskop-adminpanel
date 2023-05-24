@@ -35,18 +35,7 @@ function Messages() {
     getMessages();
   }, []);
 
-  /*async function patchMessageText(message) {
-    const newMessage = {
-      id: message.id,
-      message: editedText,
-    };
-    try {
-      await axios.patch("http://localhost:4000/messages", newMessage);
-      getMessages();
-    } catch (err) {
-      console.log(err);
-    }
-  }*/
+
 
   function openModal(messageId) {
     const message = messages.find((message) => message.id === messageId);
@@ -89,12 +78,24 @@ function Messages() {
   }
 
   async function handleApprove(message) {
-    const newMessage = {
-      id: message.id,
-      status: "approved",
-    };
+ 
+  
     try {
-      await axios.patch("http://localhost:4000/messages", newMessage);
+      if(editing === true){
+        const newMessage = {
+          id: message.id,
+          status: "approved",
+          message: editedText
+        };
+        await axios.patch("http://localhost:4000/messages", newMessage);
+      } else {
+        const newMessage = {
+          id: message.id,
+          status: "approved",
+        };
+        await axios.patch("http://localhost:4000/messages", newMessage);
+      }
+     
       getMessages();
       confetti({
         particleCount: 10,
@@ -134,7 +135,6 @@ function Messages() {
     setPendingMessages(getFilteredmessages());
   }
 
-  //overflow auto till overflow y aouto 236
 
   async function handleRegretStatus() {
     try {
@@ -204,18 +204,9 @@ function Messages() {
     setEditedText(e.target.value);
   }
 
-  function handleSaveEdit() {
-    setSelectedMessage({ ...selectedMessage, message: editedText });
-    setMessages(
-      messages.map((message) => {
-        if (message.id === selectedMessage.id) {
-          return { ...message, message: editedText };
-        }
-        return message;
-      })
-    );
-    setEditedText("");
-    setEditing(false);
+  function handleEdit(e) {
+    setEditing(true);
+    setEditedText(e.target.value);
   }
 
   function getFilteredmessages() {
@@ -338,15 +329,10 @@ function Messages() {
               <div className="flex justify-end m-4 text-xl">
                 {editing ? (
                   <div>
-                    <button
-                      onClick={() => handleSaveEdit(selectedMessage.id)}
-                      className=" rounded-3xl bg-[#02CC3B] text-white py-2 px-4"
-                    >
-                      Spara
-                    </button>
+               
                     <button
                       onClick={() => setEditing(false)}
-                      className=" rounded-3xl bg-grey text-black py-2 px-4 ml-2"
+                      className=" rounded-3xl bg-grey text-black py-2 text-sm px-4 ml-2"
                     >
                       Avbryt
                     </button>
@@ -381,11 +367,11 @@ function Messages() {
                     value={editedText}
                     onChange={handleEdit}
                     rows="10"
-                    className=" w-full"
+                    className="border border-black w-full"
                   />
                 )}
 
-                {!editing ? (
+               
                   <div className="mt-10">
                     <button
                       onClick={() => handleApprove(selectedMessage)}
@@ -400,7 +386,7 @@ function Messages() {
                       Neka
                     </button>
                   </div>
-                ) : null}
+               
               </div>
             </div>
           ) : null}
@@ -476,3 +462,5 @@ function Messages() {
   );
 }
 export default Messages;
+
+
