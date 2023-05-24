@@ -53,63 +53,69 @@ function Menu() {
 
   return (
     <div className="relative">
-      <div
+      <motion.nav
         id="MenuSmall"
-        className="inline-block md:hidden h-screen z-50 fixed top-0 left-0"
+        initial={{ clipPath: "circle(24px at 30px 30px)" }}
+        className="flex flex-col w-48 bg-primary text-white pt-2 pb-2 cursor-pointer h-screen inline-block md:hidden z-50 fixed top-0 left-0"
+        animate={isOpen ? "open" : "closed"}
+        variants={variants}
       >
-        <motion.nav
-          initial={{ clipPath: "circle(24px at 30px 30px)" }}
-          className="h-screen flex flex-col w-48 bg-primary text-white pt-2 pb-2"
-          animate={isOpen ? "open" : "closed"}
-          variants={variants}
+        <div
+          id="hamburger"
+          className="pl-[15px] pt-[7px]"
+          onClick={() => {
+            setIsOpen((isOpen) => !isOpen);
+          }}
         >
-          <div
-            id="hamburger"
-            className="pl-[15px] pt-[7px]"
-            onClick={() => {
-              setIsOpen((isOpen) => !isOpen);
-            }}
+          {isOpen ? (
+            <MdClose color="var(--white)" size={30} />
+          ) : (
+            <FiMenu color="var(--white)" size={30} />
+          )}
+        </div>
+
+        <motion.div variants={childVariants} key="start" className="mt-4">
+          <NavLink
+            to="/overview"
+            style={({ isActive }) => (isActive ? active : undefined)}
           >
-            {isOpen ? (
-              <MdClose color="var(--white)" size={30} />
-            ) : (
-              <FiMenu color="var(--white)" size={30} />
-            )}
-          </div>
+            <p className="py-4 ml-2">START</p>
+            <div className="h-px w-11/12 mx-2 bg-gradient-to-r from-accent to-primary"></div>
+          </NavLink>
+        </motion.div>
 
-          <motion.div variants={childVariants} key="start">
-            <NavLink
-              to="/overview"
-              style={({ isActive }) => (isActive ? active : undefined)}
-            >
-              <p className="py-4 ml-2">START</p>
-              <div className="h-px w-11/12 mx-2 bg-gradient-to-r from-accent to-primary"></div>
-            </NavLink>
-          </motion.div>
-
-          <motion.div variants={childVariants} key="messages">
-            <NavLink
-              to="/messages"
-              style={({ isActive }) => (isActive ? active : undefined)}
-            >
-              <p className="py-4 mx-2">INLÄGG</p>
-              <div className="h-px w-11/12 mx-2 bg-gradient-to-r from-accent to-primary"></div>
-            </NavLink>
-          </motion.div>
-
-          <motion.div
-            variants={childVariants}
-            key="logoutButton"
-            className="mb-6 mt-auto mx-auto w-40"
+        <motion.div variants={childVariants} key="messages">
+          <NavLink
+            to="/messages"
+            style={({ isActive }) => (isActive ? active : undefined)}
           >
-            <Link to="/" className="w-full">
-              <button className=" w-full transform bg-accent transition duration-500 rounded-md text-white p-2 hover:bg-accentHover">
-                Logga ut
-              </button>
-            </Link>
-          </motion.div>
-        </motion.nav>
-      </div>
+            <p className="py-4 mx-2">INLÄGG</p>
+            <div className="h-px w-11/12 mx-2 bg-gradient-to-r from-accent to-primary"></div>
+          </NavLink>
+        </motion.div>
+
+        <motion.div variants={childVariants} key="users">
+          <NavLink
+            to="/users"
+            style={({ isActive }) => (isActive ? active : undefined)}
+          >
+            <p className="py-4 mx-2">ANVÄNDARE</p>
+            <div className="h-px w-11/12 mx-2 bg-gradient-to-r from-accent to-primary"></div>
+          </NavLink>
+        </motion.div>
+
+        <motion.div
+          variants={childVariants}
+          key="logoutButton"
+          className="mb-6 mt-auto mx-auto w-40"
+        >
+          <Link to="/" className="w-full">
+            <button className=" w-full transform bg-accent transition duration-500 rounded-md text-white p-2 hover:bg-accentHover">
+              Logga ut
+            </button>
+          </Link>
+        </motion.div>
+      </motion.nav>
 
       <nav className="hidden md:flex flex-col w-48 bg-primary h-screen text-white pt-2 pb-2 z-50 fixed top-0 left-0">
         <NavLink
@@ -124,6 +130,13 @@ function Menu() {
           style={({ isActive }) => (isActive ? active : undefined)}
         >
           <p className="py-4 mx-2">INLÄGG</p>
+          <div className="h-px w-11/12 mx-2 bg-gradient-to-r from-accent to-primary"></div>
+        </NavLink>
+        <NavLink
+          to="/users"
+          style={({ isActive }) => (isActive ? active : undefined)}
+        >
+          <p className="py-4 mx-2">ANVÄNDARE</p>
           <div className="h-px w-11/12 mx-2 bg-gradient-to-r from-accent to-primary"></div>
         </NavLink>
 
