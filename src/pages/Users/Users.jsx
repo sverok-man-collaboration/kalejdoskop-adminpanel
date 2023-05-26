@@ -3,19 +3,13 @@ import { Helmet } from "react-helmet-async";
 
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { FiTrash2 } from "react-icons/fi";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 import Menu from "../../components/Menu";
 
 function Users() {
-  useEffect(() => {
-    getUsers();
-  }, []);
-
-  const [users, setUsers] = useState([
-    // töm när axios reqs är klar
-    { id: 1, name: "Test", email: "test@example.com" },
-    { id: 2, name: "Test2", email: "test2@example.com" },
-  ]);
+  const [users, setUsers] = useState([]);
 
   const [modal, setModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -25,28 +19,60 @@ function Users() {
   const [newEmail, setNewEmail] = useState("");
 
   const [deleteUserModal, setDeleteUserModal] = useState(false);
+  const [deleteUserButton, setDeleteUserButton] = useState(true);
+  const [deleteEmail, setDeleteEmail] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
 
-  function getUsers() {
-    // axios get users
-    // setUsers([])
+  const navigate = useNavigate();
+
+  async function getUsers() {
+    const token = sessionStorage.getItem("token");
+    await axios
+      .get("http://localhost:4000/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        sessionStorage.setItem("token", res.data.newToken);
+        setUsers(res.data.users);
+      })
+      .catch((err) => console.log(err));
   }
+  useEffect(() => {
+    getUsers();
+  }, []);
 
-  function addUser() {
-    if (!newUser || !newEmail) {
-      return;
-    } else {
-      // axios req {name: newUser, email: newEmail}
-
-      setAddUserModal(false);
+  async function addUser() {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (token) {
+        const res = await axios.post(
+          "http://localhost:4000/users",
+          {
+            email: newEmail,
+            name: newUser,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        sessionStorage.setItem("token", res.data.newToken);
+        setModal(true);
+        setModalMessage(`${newUser} har lagts till!`);
+        setNewEmail("");
+        setNewUser("");
+        getUsers();
+      } else {
+        console.log("No token available");
+        navigate("/");
+      }
+    } catch (err) {
+      console.log(err.message);
       setModal(true);
-
-      // setModalMessage till sträng beroende på respons
-      setModalMessage(`${newUser} har lagts till!`);
-      //setModalMessage("Avbrutet. Det måste finnas minst 1 användare.")
-
-      setNewUser("");
-      setNewEmail("");
+      setModalMessage(`${newUser} har inte lagts till! Försök igen`);
     }
   }
 
@@ -54,14 +80,30 @@ function Users() {
     setModalMessage(`Är du säker på att du vill radera ${email}?`);
     setDeleteUserModal(true);
     setDeleteId(id);
+    setDeleteEmail(email);
+    setDeleteUserButton(true);
   }
 
-  function deleteUser() {
-    // axios delete med deleteId
-
-    setModalMessage("");
-    setDeleteUserModal(false);
-    setDeleteId(null);
+  async function deleteUser() {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (token) {
+        await axios.delete(`http://localhost:4000/users/${deleteId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setModalMessage(`${deleteEmail} har taggits bort!`);
+        setDeleteUserButton(false);
+        getUsers();
+      } else {
+        console.log("No token available");
+        navigate("/");
+      }
+    } catch (err) {
+      console.log(err.message);
+      setModalMessage(`${deleteEmail} har inte taggits bort! Försök igen`);
+    }
   }
 
   return (
@@ -98,6 +140,7 @@ function Users() {
               <input
                 type="text"
                 required
+                value={newUser}
                 onChange={(e) => {
                   setNewUser(e.target.value);
                 }}
@@ -106,12 +149,14 @@ function Users() {
               <input
                 type="email"
                 required
+                value={newEmail}
                 onChange={(e) => {
                   setNewEmail(e.target.value);
                 }}
               />
 
               <button
+                type="button"
                 className="bg-accent rounded-md text-white p-2 mx-auto mt-4"
                 onClick={() => {
                   addUser();
@@ -172,11 +217,12 @@ function Users() {
                 <p>{modalMessage}</p>
 
                 <button
+                  className={`py-2 px-4 bg-accent rounded-md text-white mx-auto mt-4 ${
+                    deleteUserButton ? "block" : "hidden"
+                  }`}
                   onClick={() => {
                     deleteUser(deleteId);
-                    setModalMessage("");
                   }}
-                  className="py-2 px-4 bg-accent rounded-md text-white mx-auto mt-4"
                 >
                   JA
                 </button>
