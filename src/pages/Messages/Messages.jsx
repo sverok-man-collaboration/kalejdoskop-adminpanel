@@ -56,6 +56,7 @@ function Messages() {
     setShowMessage(false);
     setEditing(false);
     setEditedText("");
+    setSelectedMessage(null)
   }
 
   function closeChangedStatusModal() {
@@ -84,48 +85,21 @@ function Messages() {
 
   async function handleApprove(message) {
     const token = sessionStorage.getItem("token");
-    const newMessage = {
+    let newMessage = {
       id: message.id,
       status: "approved",
-      message: "",
+      message: editing === true ? (editedText) : ("")
     };
-    await axios
-      .patch("http://localhost:4000/messages", newMessage, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        sessionStorage.setItem("token", res.data.newToken);
-        getMessages();
-        confetti({
-          particleCount: 10,
-          shapes: ["star"],
-          spread: 360,
-          startVelocity: 25,
-        });
-        closeModal();
-        setShowApprove(true);
-        setPreviousMessage(message);
-      })
-      .catch((err) => console.log(err));
-
- 
   
     try {
-      if(editing === true){
-        const newMessage = {
-          id: message.id,
-          status: "approved",
-          message: editedText
-        };
-        await axios.patch("http://localhost:4000/messages", newMessage);
-      } else {
-        const newMessage = {
-          id: message.id,
-          status: "approved",
-        };
-        await axios.patch("http://localhost:4000/messages", newMessage);
-      }
-     
+      const response = await axios.patch(
+        "http://localhost:4000/messages",
+        newMessage,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      sessionStorage.setItem("token", response.data.newToken);
       getMessages();
       confetti({
         particleCount: 10,
@@ -136,19 +110,30 @@ function Messages() {
       closeModal();
       setShowApprove(true);
       setPreviousMessage(message);
-    } catch (err) {
-      console.log(err);
+      setEditing(false)
+    } catch (error) {
+      console.log(error);
     }
-    setPendingMessages(getFilteredmessages());
   }
 
+
   async function handleDeny(message) {
-    const newMessage = {
+    const token = sessionStorage.getItem("token");
+    let newMessage = {
       id: message.id,
       status: "denied",
+      message: editing === true ? (editedText) : ("")
     };
+  
     try {
-      await axios.patch("http://localhost:4000/messages", newMessage);
+      const response = await axios.patch(
+        "http://localhost:4000/messages",
+        newMessage,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      sessionStorage.setItem("token", response.data.newToken);
       getMessages();
       confetti({
         particleCount: 10,
@@ -157,12 +142,11 @@ function Messages() {
         startVelocity: 25,
       });
       closeModal();
-      setShowDeny(true);
+      setShowApprove(true);
       setPreviousMessage(message);
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
     }
-    setPendingMessages(getFilteredmessages());
   }
 
 
@@ -295,7 +279,7 @@ function Messages() {
                     <p className="truncate w-full max-w-xs">
                       {message.message}
                     </p>
-                    <IoMdCheckmarkCircleOutline className="text-[#02CC3B] p-10" />
+                    <img src="denied.png" className="text-[#02CC3B] p-10" />
                   </li>
                 ))}
 
@@ -312,7 +296,7 @@ function Messages() {
                     <p className="truncate w-full max-w-xs">
                       {message.message}
                     </p>
-                    <MdOutlineLocalPostOffice className="text-[#0827F5]" />
+                    <img src="pending3.png" className="text-[#0827F5] w-5 h-4" />
                   </li>
                 ))}
 
@@ -329,7 +313,7 @@ function Messages() {
                     <p className="truncate w-full max-w-xs">
                       {message.message}
                     </p>
-                    <IoMdCheckmarkCircleOutline className="text-[#02CC3B]" />
+                    <img src="approved3.png" className="text-[#02CC3B] w-6 h-4" />
                   </li>
                 ))}
 
@@ -346,7 +330,7 @@ function Messages() {
                     <p className="truncate w-full max-w-xs">
                       {message.message}
                     </p>
-                    <MdOutlineDoNotDisturbAlt className="text-[#FF1C1C]" />
+                    <img src="denied3.png" className="text-[#FF1C1C] w-5 h-4" />
                   </li>
                 ))}
             </ul>
