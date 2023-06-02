@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { BiEdit, BiXCircle } from "react-icons/bi";
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import {
-  MdOutlineDoNotDisturbAlt,
-  MdOutlineLocalPostOffice,
-} from "react-icons/md";
 import Menu from "../../components/Menu";
 import confetti from "canvas-confetti";
 import axios from "axios";
+import { format } from "date-fns";
 
 function Messages() {
   const [showMessage, setShowMessage] = useState(false);
@@ -16,7 +11,7 @@ function Messages() {
   const [showDeny, setShowDeny] = useState(false);
   const [editing, setEditing] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [pendingMessages, setPendingMessages] = useState(getFilteredmessages);
+  const [pendingMessages, setPendingMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [previousMessage, setPreviousMessage] = useState(null);
   const [filter, setFilter] = useState("all");
@@ -34,6 +29,7 @@ function Messages() {
       .then((res) => {
         sessionStorage.setItem("token", res.data.newToken);
         setMessages(res.data.messages);
+        setPendingMessages(getFilteredmessages(res.data.messages));
       })
       .catch((err) => console.log(err));
   }
@@ -41,14 +37,13 @@ function Messages() {
     getMessages();
   }, []);
 
-
   function openModal(messageId) {
     const message = messages.find((message) => message.id === messageId);
 
     setShowApprove(false);
     setShowDeny(false);
     setSelectedMessage(message);
-
+    setEditing(false);
     setShowMessage(true);
   }
 
@@ -56,7 +51,7 @@ function Messages() {
     setShowMessage(false);
     setEditing(false);
     setEditedText("");
-    setSelectedMessage(null)
+    setSelectedMessage(null);
   }
 
   function closeChangedStatusModal() {
@@ -83,14 +78,14 @@ function Messages() {
     }
   }
 
-  async function handleApprove(message) {
+  async function handleMessage(message, action) {
     const token = sessionStorage.getItem("token");
     let newMessage = {
       id: message.id,
-      status: "approved",
-      message: editing === true ? (editedText) : ("")
+      status: action === "approve" ? "approved" : "denied",
+      message: editing === true ? editedText : "",
     };
-  
+
     try {
       const response = await axios.patch(
         "http://localhost:4000/messages",
@@ -108,51 +103,31 @@ function Messages() {
         startVelocity: 25,
       });
       closeModal();
-      setShowApprove(true);
+
+      if (action === "approve") {
+        setShowApprove(true);
+      } else {
+        setShowDeny(true);
+      }
+
       setPreviousMessage(message);
-      setEditing(false)
+      setEditing(false);
     } catch (error) {
       console.log(error);
     }
   }
-
-
-  async function handleDeny(message) {
-    const token = sessionStorage.getItem("token");
-    let newMessage = {
-      id: message.id,
-      status: "denied",
-      message: editing === true ? (editedText) : ("")
-    };
-  
-    try {
-      const response = await axios.patch(
-        "http://localhost:4000/messages",
-        newMessage,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      sessionStorage.setItem("token", response.data.newToken);
-      getMessages();
-      confetti({
-        particleCount: 10,
-        shapes: ["star"],
-        spread: 360,
-        startVelocity: 25,
-      });
-      closeModal();
-      setShowApprove(true);
-      setPreviousMessage(message);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
 
   async function handleRegretStatus() {
+    const token = sessionStorage.getItem("token");
     try {
-      await axios.patch("http://localhost:4000/messages", previousMessage);
+      const response = await axios.patch(
+        "http://localhost:4000/messages",
+        previousMessage,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      sessionStorage.setItem("token", response.data.newToken);
       getMessages();
       setSelectedMessage(previousMessage);
     } catch (err) {
@@ -177,29 +152,13 @@ function Messages() {
 
   function handleTitle() {
     if (filter === "all") {
-      return (
-        <p className=" text-center mt-5 mb-2 border-b border-accent w-[100%]">
-          INLÄGG
-        </p>
-      );
+      return <p className="text-white">Inlägg</p>;
     } else if (filter === "pending") {
-      return (
-        <p className="text-center mt-5  mb-2 border-b border-accent w-[100%]">
-          NYTT
-        </p>
-      );
+      return <p className="text-white">Nytt</p>;
     } else if (filter === "approved") {
-      return (
-        <p className=" text-center mt-5  mb-2 border-b border-accent w-[100%]">
-          GODKÄNDA
-        </p>
-      );
+      return <p className="text-white">Godkända</p>;
     } else if (filter === "denied") {
-      return (
-        <p className=" text-center mt-5  mb-2 border-b border-accent w-[100%]">
-          NEKADE
-        </p>
-      );
+      return <p className="text-white">Nekade</p>;
     }
   }
 
@@ -218,42 +177,37 @@ function Messages() {
     setEditedText(e.target.value);
   }
 
-  function handleEdit(e) {
-    setEditing(true);
-    setEditedText(e.target.value);
-  }
-
-  function getFilteredmessages() {
+  function getFilteredmessages(messages) {
     return messages.filter((message) => message.status === "pending");
   }
 
   function nextMessage() {
-    const pendingMessages = filteredMessages().filter(
-      (message) => message.status === "pending"
-    );
-    const currentMessageIndex = pendingMessages.findIndex(
-      (message) => message.id === selectedMessage?.id
-    );
-    const nextMessageIndex = (currentMessageIndex + 1) % pendingMessages.length;
+    if (pendingMessages.length > 0) {
+      const currentMessageIndex = pendingMessages.findIndex(
+        (message) => message.id === selectedMessage?.id
+      );
+      const nextMessageIndex =
+        (currentMessageIndex + 1) % pendingMessages.length;
 
-    const nextMessage = pendingMessages[nextMessageIndex];
-    setSelectedMessage(nextMessage);
-    openModal(nextMessage.id);
+      const nextMessage = pendingMessages[nextMessageIndex];
+      setSelectedMessage(nextMessage);
+      openModal(nextMessage.id);
+    }
   }
-
   return (
     <div>
       <Helmet>
         <title>Beskrivande text</title>
       </Helmet>
       <Menu />
-      <div className="flex flex-row h-screen xs:mx-[20px] md:ml-[194px]">
-        <div className="flex w-[100%] md:w-1/2 flex-col items-center h-full">
-          <form className="mt-20 max-w-[100%]">
+      <div className="flex flex-row h-screen xs:mx-[20px] md:ml-[192px]">
+        <div className="flex w-full  border-l-accent pl-1 md:w-2/4 flex-col items-center h-full bg-primary">
+          <div className=" flex flex-row justify-between w-full px-4 mt-16 md:mt-5 mb-4">
+            {handleTitle()}
             <select
               onChange={handleFilter}
               value={filter}
-              className="border border-primary p-1 cursor-pointer"
+              className="rounded-sm text-xs cursor-pointer"
             >
               <option default value="all">
                 Alla inlägg
@@ -262,41 +216,34 @@ function Messages() {
               <option value="denied">Nekade inlägg</option>
               <option value="pending">Obesvarade inlägg</option>
             </select>
-          </form>
-          <div className="w-[100%] h-full overflow-hidden">
-            {handleTitle()}
-            <ul className="overflow-y-auto touch-auto h-[90%] w-[100%]">
-              {filteredMessages()
-                .filter((message) => message.status === "all")
-                .map((message) => (
-                  <li
-                    className={`hover:bg-grey cursor-pointer flex flex-row justify-between p-1 ${
-                      message.id === selectedMessage?.id ? "bg-grey" : ""
-                    }`}
-                    key={message.id}
-                    onClick={() => openModal(message.id)}
-                  >
-                    <p className="truncate w-full max-w-xs">
-                      {message.message}
-                    </p>
-                    <img src="denied.png" className="text-[#02CC3B] p-10" />
-                  </li>
-                ))}
+          </div>
 
+          <div className="w-full h-full overflow-hidden">
+            <ul className="overflow-y-auto overflow-x-hidden touch-auto h-[98%] w-full">
               {filteredMessages()
                 .filter((message) => message.status === "pending")
                 .map((message) => (
                   <li
-                    className={`hover:bg-grey cursor-pointer flex flex-row justify-between p-1 ${
-                      message.id === selectedMessage?.id ? "bg-grey" : ""
+                    className={`hover:bg-grey rounded-sm cursor-pointer flex flex-row px-1 py-4 border-r border-r-grey border-y border-y-grey border-l-4 border-l-[#0827F5] mb-1 ${
+                      message.id === selectedMessage?.id
+                        ? "bg-grey"
+                        : "bg-[#f0f8ff]"
                     }`}
                     key={message.id}
                     onClick={() => openModal(message.id)}
                   >
-                    <p className="truncate w-full max-w-xs">
-                      {message.message}
-                    </p>
-                    <img src="pending3.png" className="text-[#0827F5] w-5 h-4" />
+                    <img src="pendingicon.png" className="w-8 h-8" />
+                    <div className="flex-row ml-2 w-[80%]">
+                      <p className="truncate max-w-xs text-base font-bold">
+                        {message.message}
+                      </p>
+                      <p className="truncate w-full max-w-xs text-xs font-bold ">
+                        {format(
+                          new Date(message.timestamp),
+                          "yyyy-MM-dd HH:mm"
+                        )}
+                      </p>
+                    </div>
                   </li>
                 ))}
 
@@ -304,16 +251,25 @@ function Messages() {
                 .filter((message) => message.status === "approved")
                 .map((message) => (
                   <li
-                    className={`hover:bg-grey cursor-pointer flex flex-row justify-between p-1 ${
-                      message.id === selectedMessage?.id ? "bg-grey" : ""
+                    className={`hover:bg-grey rounded-sm cursor-pointer flex flex-row pl-1 py-4 border border-grey pl-2 mb-1  ${
+                      message.id === selectedMessage?.id ? "bg-grey" : "bg-white"
                     }`}
                     key={message.id}
                     onClick={() => openModal(message.id)}
                   >
-                    <p className="truncate w-full max-w-xs">
-                      {message.message}
-                    </p>
-                    <img src="approved3.png" className="text-[#02CC3B] w-6 h-4" />
+                    {" "}
+                    <img src="approvedicon.png" className="w-8 h-8" />
+                    <div className="flex-row ml-2 w-[80%]">
+                      <p className="truncate w-full max-w-xs text-base">
+                        {message.message}
+                      </p>
+                      <p className="truncate w-full max-w-xs  text-xs">
+                        {format(
+                          new Date(message.timestamp),
+                          "yyyy-MM-dd HH:mm"
+                        )}
+                      </p>
+                    </div>
                   </li>
                 ))}
 
@@ -321,112 +277,125 @@ function Messages() {
                 .filter((message) => message.status === "denied")
                 .map((message) => (
                   <li
-                    className={`hover:bg-grey cursor-pointer flex flex-row justify-between p-1 ${
-                      message.id === selectedMessage?.id ? "bg-grey" : ""
+                    className={`hover:bg-grey rounded-sm cursor-pointer flex flex-row px-1 py-4 border border-grey pl-2 mb-1  ${
+                      message.id === selectedMessage?.id ? "bg-grey" : "bg-white"
                     }`}
                     key={message.id}
                     onClick={() => openModal(message.id)}
                   >
-                    <p className="truncate w-full max-w-xs">
-                      {message.message}
-                    </p>
-                    <img src="denied3.png" className="text-[#FF1C1C] w-5 h-4" />
+                    <img src="deniedicon.png" className="w-8 h-8" />
+                    <div className="flex-row ml-2 w-[80%]">
+                      <p className="truncate w-full max-w-xs text-base">
+                        {message.message}
+                      </p>
+                      <p className="truncate w-full max-w-xs text-xs ">
+                        {format(
+                          new Date(message.timestamp),
+                          "yyyy-MM-dd HH:mm"
+                        )}
+                      </p>
+                    </div>
                   </li>
                 ))}
             </ul>
           </div>
         </div>
 
-        <div className=" md:pt-[90px] md:h-full overflow-y-auto">
+        <div className=" md:pt-[30px] w-full h-full overflow-y-auto">
           {showMessage ? (
-            <div className="fixed top-0 left-0 bottom-0 right-0 z-50 bg-white md:relative ">
-              <div className="flex justify-end m-4 text-xl">
+            <div className="fixed top-0 left-0 bottom-0 right-0 mr-4 md:mr-0 z-50 bg-white md:relative flex  flex-col ">
+              <div className="flex justify-end text-xl">
                 {editing ? (
-                  <div>
-               
-                    <button
-                      onClick={() => setEditing(false)}
-                      className=" rounded-3xl bg-grey text-black py-2 text-sm px-4 ml-2"
-                    >
-                      Avbryt
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setEditing(false)}
+                    className=" rounded-lg bg-grey text-black py-2 text-sm px-4"
+                  >
+                    Avbryt
+                  </button>
                 ) : (
-                  <div className="flex flex-row">
+                  <div className="flex flex-row pt-4">
                     {" "}
-                    <BiEdit
+                    <img
+                      src="edit.png"
                       onClick={handleEdit}
-                      className="cursor-pointer text-[#0827F5]"
+                      className="cursor-pointer w-5 h-5"
                     />{" "}
-                    <BiXCircle
-                      className="cursor-pointer ml-3"
+                    <img
+                      src="x-square.png"
+                      className="cursor-pointer ml-3 w-5 h-5"
                       onClick={closeModal}
                     />
                   </div>
                 )}
               </div>
-              <div className="m-10">
+
+              <div className="xs:m-10 m-4 ">
+                <p className="mb-4 flex flex-row">
+                  {format(new Date(selectedMessage.timestamp), "yyyy-MM-dd")}{" "}
+                  {format(new Date(selectedMessage.timestamp), "HH:mm")}
+                </p>
+                <p className="mb-2 flex flex-row text-sm">
+                  Status: {handleStatus()}
+                </p>
+                <p className="mb-2 flex flex-row text-sm">
+                  Rum: {selectedMessage.room}
+                </p>
+                <p className="mb-4 flex flex-row text-sm">
+                  Objekt: {selectedMessage.object}
+                </p>{" "}
                 {!editing ? (
-                  <div>
-                    {" "}
-                    <p className="mb-4 flex flex-row">
-                      Status: {handleStatus()}
-                    </p>
-                    <p>{selectedMessage.message}</p>
-                  </div>
+                  <p>{selectedMessage.message}</p>
                 ) : (
                   <textarea
                     id={selectedMessage.id}
                     defaultValue={selectedMessage.message}
                     value={editedText}
                     onChange={handleEdit}
-                    rows="10"
-                    className="border border-black w-full"
+                    rows={6}
+                    className="border border-black w-full h-auto"
                   />
                 )}
-
-               
-                  <div className="mt-10">
-                    <button
-                      onClick={() => handleApprove(selectedMessage)}
-                      className=" rounded-3xl bg-[#02CC3B] text-white py-2 px-2"
-                    >
-                      Godkänn
-                    </button>
-                    <button
-                      onClick={() => handleDeny(selectedMessage)}
-                      className="rounded-3xl bg-[#FF1C1C] text-white py-2 px-6 ml-2"
-                    >
-                      Neka
-                    </button>
-                  </div>
-               
+              </div>
+              <div className="m-10">
+                <button
+                  onClick={() => handleMessage(selectedMessage, "approve")}
+                  className=" rounded-lg bg-[#02CC3B] text-white py-2 px-2"
+                >
+                  Godkänn
+                </button>
+                <button
+                  onClick={() => handleMessage(selectedMessage, "deny")}
+                  className="rounded-lg bg-[#FF1C1C] text-white py-2 px-6 ml-2"
+                >
+                  Neka
+                </button>
               </div>
             </div>
           ) : null}
           {showApprove ? (
-            <div className="mt-20 fixed top-0 left-0 bottom-0 right-0 z-50 bg-white md:relative">
-              <div className="flex justify-end mr-8">
-                <BiXCircle
-                  className="cursor-pointer ml-3"
+            <div className="fixed top-0 left-0 bottom-0 right-0 z-50 bg-white md:relative">
+              <div className="flex justify-end mt-0 md:mt-4 mr:2 md:mr-0">
+                <img
+                  src="x-square.png"
+                  className="cursor-pointer ml-3 w-5 h-5 mt-10 md:mt-0"
                   onClick={closeChangedStatusModal}
                 />
               </div>
-              <div className="flex items-center justify-center flex-col">
-                <p className="mb-10 text-lg ml-2">
+              <div className="flex flex-col justify-center items-center mt-20">
+                <p className="mb-10 text-lg">
                   Inlägget har <span className="text-[#02CC3B]">godkänts</span>
                 </p>
                 <div>
                   <button
                     onClick={startRegret}
-                    className="rounded-3xl bg-grey text-black py-2 px-8"
+                    className="rounded-lg bg-grey text-black py-2  w-20"
                   >
                     Ångra
                   </button>
                   {pendingMessages && pendingMessages.length > 0 ? (
                     <button
                       onClick={nextMessage}
-                      className="rounded-3xl bg-[#0827F5] text-white py-2 px-8 ml-4"
+                      className="rounded-lg bg-[#0827F5] text-white py-2 px-6 ml-4"
                     >
                       Nästa
                     </button>
@@ -438,28 +407,29 @@ function Messages() {
             </div>
           ) : null}
           {showDeny ? (
-            <div className="mt-20 fixed top-0 left-0 bottom-0 right-0 z-50 bg-white md:relative ">
-              <div className="flex justify-end mr-8">
-                <BiXCircle
-                  className="cursor-pointer ml-3"
+            <div className="fixed top-0 left-0 bottom-0 right-0 z-50 bg-white md:relative">
+            <div className="flex justify-end mt-0 md:mt-4 mr:2 md:mr-0">
+                <img
+                  src="x-square.png"
+                  className="cursor-pointer ml-3 w-5 h-5"
                   onClick={closeChangedStatusModal}
                 />
               </div>
-              <div className="flex items-center justify-center flex-col">
+              <div className="flex items-center justify-center flex-col mt-20">
                 <p className="mb-10 text-lg">
                   Inlägget har <span className="text-[#FF1C1C]">nekats</span>
                 </p>
                 <div>
                   <button
                     onClick={startRegret}
-                    className="rounded-3xl bg-grey text-black py-2 px-8"
+                    className="rounded-lg bg-grey text-black py-2  w-20"
                   >
                     Ångra
                   </button>
                   {pendingMessages && pendingMessages.length > 0 ? (
                     <button
                       onClick={nextMessage}
-                      className="rounded-3xl bg-[#0827F5] text-white py-2 px-6 ml-4"
+                      className="rounded-lg bg-[#0827F5] text-white py-2 px-6 ml-4"
                     >
                       Nästa
                     </button>
@@ -476,5 +446,3 @@ function Messages() {
   );
 }
 export default Messages;
-
-
