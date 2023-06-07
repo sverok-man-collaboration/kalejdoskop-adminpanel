@@ -59,8 +59,6 @@ function Messages() {
     setShowDeny(false);
   }
 
-  // ska vi ha med room och object i adminpanelen också i meddelande modalen? avvakta med detta
-
   function handleFilter(e) {
     setFilter(e.target.value);
     closeModal();
@@ -252,7 +250,9 @@ function Messages() {
                 .map((message) => (
                   <li
                     className={`hover:bg-grey rounded-sm cursor-pointer flex flex-row pl-1 py-4 border border-grey pl-2 mb-1  ${
-                      message.id === selectedMessage?.id ? "bg-grey" : "bg-white"
+                      message.id === selectedMessage?.id
+                        ? "bg-grey"
+                        : "bg-white"
                     }`}
                     key={message.id}
                     onClick={() => openModal(message.id)}
@@ -278,7 +278,9 @@ function Messages() {
                 .map((message) => (
                   <li
                     className={`hover:bg-grey rounded-sm cursor-pointer flex flex-row px-1 py-4 border border-grey pl-2 mb-1  ${
-                      message.id === selectedMessage?.id ? "bg-grey" : "bg-white"
+                      message.id === selectedMessage?.id
+                        ? "bg-grey"
+                        : "bg-white"
                     }`}
                     key={message.id}
                     onClick={() => openModal(message.id)}
@@ -408,7 +410,7 @@ function Messages() {
           ) : null}
           {showDeny ? (
             <div className="fixed top-0 left-0 bottom-0 right-0 z-50 bg-white md:relative">
-            <div className="flex justify-end mt-0 md:mt-4 mr:2 md:mr-0">
+              <div className="flex justify-end mt-0 md:mt-4 mr:2 md:mr-0">
                 <img
                   src="x-square.png"
                   className="cursor-pointer ml-3 w-5 h-5"
