@@ -44,3 +44,18 @@ h5,
 h6 {
   font-family: "DocumanHeavy";
 }
+
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--secondary-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+}
