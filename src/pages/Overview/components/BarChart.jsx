@@ -32,7 +32,7 @@ function BarChart() {
           {
             backgroundColor: [
               "#FCC49C",
-              "#EE9554",
+              "#0827F5",
               "#451499",
               "#c8b2ff",
               "#d9dbda",

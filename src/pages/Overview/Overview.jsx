@@ -42,7 +42,7 @@ function Overview() {
       <Menu />
       <div className=" w-full mx-auto md:ml-52 lg:ml-72">
         <div className="mt-20 flex flex-row flex-wrap w-full">
-          <div className="flex items-center h-[110px] pb-2 bg-gradient-to-r m-2 from-[#FCC49C] to-[#EE9554] shadow-[#EE9554] shadow-md w-[43%] max-w-[180px]">
+          <div className="flex items-center h-[110px] pb-2 bg-gradient-to-r m-2 from-[#8997F5] to-[#0827F5] shadow-[#0827F5] shadow-md w-[43%] max-w-[180px]">
             <h4 className="flex flex-col text-white ml-4">
               Nya inlägg <span>{pendingMessages.length}</span>
             </h4>
