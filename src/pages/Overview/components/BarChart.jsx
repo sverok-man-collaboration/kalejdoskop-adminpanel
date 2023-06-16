@@ -31,13 +31,13 @@ function BarChart() {
         datasets: [
           {
             backgroundColor: [
-              "#FCC49C",
+              "#8997F5",
               "#0827F5",
               "#451499",
               "#c8b2ff",
               "#d9dbda",
-              "#f7528b",
-              "#F41A65",
+              "#5FF78A",
+              "#02CC3B",
             ],
             label: "Antal nedladdningar senaste veckan",
             data: data.map((row) => row.downloads),

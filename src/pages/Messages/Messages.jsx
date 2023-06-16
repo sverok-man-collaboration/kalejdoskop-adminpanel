@@ -4,8 +4,12 @@ import Menu from "../../components/Menu";
 import confetti from "canvas-confetti";
 import axios from "axios";
 import { format } from "date-fns";
+import { useLocation } from "react-router-dom";
 
 function Messages() {
+  const location = useLocation();
+  const filterFromState = location.state?.filter;
+
   const [showMessage, setShowMessage] = useState(false);
   const [showApprove, setShowApprove] = useState(false);
   const [showDeny, setShowDeny] = useState(false);
@@ -14,7 +18,7 @@ function Messages() {
   const [pendingMessages, setPendingMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [previousMessage, setPreviousMessage] = useState(null);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState(filterFromState || "all");
   const [editedText, setEditedText] = useState("");
 
   //axios
@@ -33,6 +37,7 @@ function Messages() {
       })
       .catch((err) => console.log(err));
   }
+
   useEffect(() => {
     getMessages();
   }, []);
@@ -75,6 +80,10 @@ function Messages() {
       return messages;
     }
   }
+
+  useEffect(() => {
+    filteredMessages();
+  }, [filter]);
 
   async function handleMessage(message, action) {
     const token = sessionStorage.getItem("token");
@@ -150,13 +159,13 @@ function Messages() {
 
   function handleTitle() {
     if (filter === "all") {
-      return <p className="text-white">Inlägg</p>;
+      return <p className="text-black">Inlägg</p>;
     } else if (filter === "pending") {
-      return <p className="text-white">Nytt</p>;
+      return <p className="text-black">Nytt</p>;
     } else if (filter === "approved") {
-      return <p className="text-white">Godkända</p>;
+      return <p className="text-black">Godkända</p>;
     } else if (filter === "denied") {
-      return <p className="text-white">Nekade</p>;
+      return <p className="text-black">Nekade</p>;
     }
   }
 
@@ -198,9 +207,9 @@ function Messages() {
         <title>Beskrivande text</title>
       </Helmet>
       <Menu />
-      <div className="flex flex-row h-screen xs:mx-[20px] md:ml-[192px]">
-        <div className="flex w-full  border-l-accent pl-1 md:w-2/4 flex-col items-center h-full bg-primary">
-          <div className=" flex flex-row justify-between w-full px-4 mt-16 md:mt-5 mb-4">
+      <div className="bg-cover bg-[url('/kalejdoskop-bg.png')] flex flex-row h-screen md:pl-[192px]">
+        <div className="flex w-full pl-1 md:w-2/4 flex-col items-center h-full bg-white/80">
+          <div className=" flex flex-row md:border border-grey justify-between w-full px-4 pt-16 md:pt-5 pb-4">
             {handleTitle()}
             <select
               onChange={handleFilter}
@@ -210,9 +219,9 @@ function Messages() {
               <option default value="all">
                 Alla inlägg
               </option>
+              <option value="pending">Nya inlägg</option>
               <option value="approved">Godkända inlägg</option>
               <option value="denied">Nekade inlägg</option>
-              <option value="pending">Obesvarade inlägg</option>
             </select>
           </div>
 
@@ -303,19 +312,19 @@ function Messages() {
           </div>
         </div>
 
-        <div className=" md:pt-[30px] w-full h-full overflow-y-auto">
+        <div className=" bg-white bg-opacity-60 md:pt-[30px] md:px-[10px] w-full h-full overflow-y-auto">
           {showMessage ? (
-            <div className="fixed top-0 left-0 bottom-0 right-0 mr-4 md:mr-0 z-50 bg-white md:relative flex  flex-col ">
+            <div className="fixed top-0 left-0 bottom-0 right-0 mr-4 md:mr-0 z-50 bg-white md:bg-white/80 md:relative flex  flex-col ">
               <div className="flex justify-end text-xl">
                 {editing ? (
                   <button
                     onClick={() => setEditing(false)}
-                    className=" rounded-lg bg-grey text-black py-2 text-sm px-4"
+                    className=" p-2 bg-accent rounded-md text-white text-sm mt-4 mr-4 block"
                   >
                     Avbryt
                   </button>
                 ) : (
-                  <div className="flex flex-row pt-4">
+                  <div className="flex flex-row mt-4 mr-4">
                     {" "}
                     <img
                       src="edit.png"

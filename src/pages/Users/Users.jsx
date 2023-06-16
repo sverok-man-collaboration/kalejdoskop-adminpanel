@@ -113,155 +113,157 @@ function Users() {
       </Helmet>
       <Menu />
 
-      <div className="mt-24 md:ml-48 relative sm:ml-4">
-        <h1 className="ml-4 mb-4 text-lg">Användare</h1>
+      <div className="bg-cover bg-[url('/kalejdoskop-bg.png')] w-full h-screen md:pl-[192px]">
+        <div className="pt-24 flex w-full flex-col  h-full bg-white/80">
+          <h1 className="ml-4 mb-4 text-lg">Användare</h1>
 
-        {addUserModal ? (
-          <div className="z-50 fixed top-0 left-0 bottom-0 right-0 md:relative pt-24 md:py-4 px-4 md:mb-8 md:px-4 md:ml-4 bg-secondary md:max-w-[50%] lg:max-w-[30%] rounded-md">
-            <div className="text-right w-[80%] sm:w-[60%] md:w-full mx-auto">
-              <button
-                className="p-2 bg-accent rounded-md text-white text-sm"
-                onClick={() => {
-                  setAddUserModal(false);
-                  setNewUser("");
-                  setNewEmail("");
-                }}
-              >
-                Stäng
-              </button>
-            </div>
-
-            <h6 className=" w-[80%] sm:w-[60%] md:w-full mx-auto">
-              Ny användare
-            </h6>
-
-            <form className="flex flex-col my-4 w-[80%] sm:w-[60%] md:w-full mx-auto">
-              <label>Namn</label>
-              <input
-                type="text"
-                required
-                value={newUser}
-                onChange={(e) => {
-                  setNewUser(e.target.value);
-                }}
-              />
-              <label className="mt-2">E-mail</label>
-              <input
-                type="email"
-                required
-                value={newEmail}
-                onChange={(e) => {
-                  setNewEmail(e.target.value);
-                }}
-              />
-
-              <button
-                type="button"
-                className="bg-accent rounded-md text-white p-2 mx-auto mt-4"
-                onClick={() => {
-                  addUser();
-                }}
-              >
-                Lägg till
-              </button>
-            </form>
-          </div>
-        ) : (
-          <button
-            className="flex items-center transform bg-accent transition duration-500 rounded-md text-white py-2 px-4 hover:bg-accentHover ml-4"
-            onClick={() => {
-              setAddUserModal(true);
-            }}
-          >
-            <AiOutlinePlusCircle className="mr-1 h-[1.2em] w-[1.2em]" /> Lägg
-            till användare
-          </button>
-        )}
-
-        {modal ? (
-          <div className="z-50 fixed top-0 left-0 bottom-0 right-0 pt-24 px-4 bg-white bg-opacity-30 backdrop-filter backdrop-blur">
-            <div className="w-[90%] sm:w-[60%] md:w-[50%] h-[50%] mx-auto bg-secondary p-4 rounded-md">
-              <button
-                className="p-2 bg-accent rounded-md text-white text-sm ml-auto block"
-                onClick={() => {
-                  setModal(false);
-                  setModalMessage("");
-                }}
-              >
-                Stäng
-              </button>
-
-              <div className="w-[80%] sm:w-[60%] md:w-full mx-auto text-center flex flex-col h-[80%] justify-center">
-                <p>{modalMessage}</p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
-
-        {deleteUserModal ? (
-          <div className="z-50 fixed top-0 left-0 bottom-0 right-0 pt-24 px-4 bg-white bg-opacity-30 backdrop-filter backdrop-blur">
-            <div className="w-[90%] sm:w-[60%] md:w-[50%] h-[50%] mx-auto bg-secondary p-4 rounded-md">
-              <button
-                className="p-2 bg-accent rounded-md text-white text-sm ml-auto block"
-                onClick={() => {
-                  setDeleteUserModal(false);
-                  setDeleteId(null);
-                }}
-              >
-                Stäng
-              </button>
-
-              <div className="w-[80%] sm:w-[60%] md:w-full mx-auto text-center flex flex-col h-[80%] justify-center">
-                <p>{modalMessage}</p>
-
+          {addUserModal ? (
+            <div className="z-50 fixed top-0 left-0 bottom-0 right-0  pt-24 md:py-4 px-4 md:mb-8 md:px-4 md:ml-4 bg-secondary md:max-w-[50%] lg:max-w-[30%] rounded-md">
+              <div className="text-right w-[80%] sm:w-[60%] md:w-full mx-auto">
                 <button
-                  className={`py-2 px-4 bg-accent rounded-md text-white mx-auto mt-4 ${
-                    deleteUserButton ? "block" : "hidden"
-                  }`}
+                  className="p-2 bg-accent rounded-md text-white text-sm"
                   onClick={() => {
-                    deleteUser(deleteId);
+                    setAddUserModal(false);
+                    setNewUser("");
+                    setNewEmail("");
                   }}
                 >
-                  JA
+                  Stäng
                 </button>
               </div>
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
 
-        <table className="mx-1 mt-10 max-w-screen md:mx4">
-          <thead className="border-b-2 border-primary text-left">
-            <tr>
-              <th className="px-2">Namn</th>
-              <th className="px-2">E-mail</th>
-              <th className="px-2">Ta bort</th>
-            </tr>
-          </thead>
-          <tbody className="text-left">
-            {users.map((user) => {
-              return (
-                <tr key={user.id}>
-                  <td className="px-2 pt-2">{user.name}</td>
-                  <td className="px-2 pt-2">{user.email}</td>
-                  <td className="px-2 pt-2">
-                    <button
-                      className="w-full"
-                      onClick={() => {
-                        handleDeleteUserModal(user.id, user.email);
-                      }}
-                    >
-                      <FiTrash2 className="mx-auto text-primary" />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              <h6 className=" w-[80%] sm:w-[60%] md:w-full mx-auto">
+                Ny användare
+              </h6>
+
+              <form className="flex flex-col my-4 w-[80%] sm:w-[60%] md:w-full mx-auto">
+                <label>Namn</label>
+                <input
+                  type="text"
+                  required
+                  value={newUser}
+                  onChange={(e) => {
+                    setNewUser(e.target.value);
+                  }}
+                />
+                <label className="mt-2">E-mail</label>
+                <input
+                  type="email"
+                  required
+                  value={newEmail}
+                  onChange={(e) => {
+                    setNewEmail(e.target.value);
+                  }}
+                />
+
+                <button
+                  type="button"
+                  className="bg-accent rounded-md text-white p-2 mx-auto mt-4"
+                  onClick={() => {
+                    addUser();
+                  }}
+                >
+                  Lägg till
+                </button>
+              </form>
+            </div>
+          ) : (
+            <button
+              className="flex items-center transform bg-accent transition duration-500 rounded-md text-white w-[194px] py-2 px-4 hover:bg-accentHover ml-4"
+              onClick={() => {
+                setAddUserModal(true);
+              }}
+            >
+              <AiOutlinePlusCircle className="mr-1 h-[1.2em] w-[1.2em]" /> Lägg
+              till användare
+            </button>
+          )}
+
+          {modal ? (
+            <div className="z-50 fixed top-0 left-0 bottom-0 right-0 pt-24 px-4 bg-white bg-opacity-30 backdrop-filter backdrop-blur">
+              <div className="w-[90%] sm:w-[60%] md:w-[50%] h-[50%] mx-auto bg-secondary p-4 rounded-md">
+                <button
+                  className="p-2 bg-accent rounded-md text-white text-sm ml-auto block"
+                  onClick={() => {
+                    setModal(false);
+                    setModalMessage("");
+                  }}
+                >
+                  Stäng
+                </button>
+
+                <div className="w-[80%] sm:w-[60%] md:w-full mx-auto text-center flex flex-col h-[80%] justify-center">
+                  <p>{modalMessage}</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
+
+          {deleteUserModal ? (
+            <div className="z-50 fixed top-0 left-0 bottom-0 right-0 pt-24 px-4 bg-white bg-opacity-30 backdrop-filter backdrop-blur">
+              <div className="w-[90%] sm:w-[60%] md:w-[50%] h-[50%] mx-auto bg-secondary p-4 rounded-md">
+                <button
+                  className="p-2 bg-accent rounded-md text-white text-sm ml-auto block"
+                  onClick={() => {
+                    setDeleteUserModal(false);
+                    setDeleteId(null);
+                  }}
+                >
+                  Stäng
+                </button>
+
+                <div className="w-[80%] sm:w-[60%] md:w-full mx-auto text-center flex flex-col h-[80%] justify-center">
+                  <p>{modalMessage}</p>
+
+                  <button
+                    className={`py-2 px-4 bg-accent rounded-md text-white mx-auto mt-4 ${
+                      deleteUserButton ? "block" : "hidden"
+                    }`}
+                    onClick={() => {
+                      deleteUser(deleteId);
+                    }}
+                  >
+                    JA
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
+
+          <table className="mx-1 mt-10 w-[80%] 2xl:w-[50%] md:mx4">
+            <thead className="border-b-2 border-primary text-left">
+              <tr>
+                <th className="px-2">Namn</th>
+                <th className="px-2">E-mail</th>
+                <th className="px-2">Ta bort</th>
+              </tr>
+            </thead>
+            <tbody className="text-left">
+              {users.map((user) => {
+                return (
+                  <tr className="border-b border-grey" key={user.id}>
+                    <td className="px-4 pt-4">{user.name}</td>
+                    <td className="px-4 pt-4">{user.email}</td>
+                    <td className="px-4 pt-4">
+                      <button
+                        className="w-10"
+                        onClick={() => {
+                          handleDeleteUserModal(user.id, user.email);
+                        }}
+                      >
+                        <FiTrash2 className="text-primary" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
