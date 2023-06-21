@@ -4,7 +4,7 @@ import Menu from "../../components/Menu";
 import confetti from "canvas-confetti";
 import axios from "axios";
 import { format } from "date-fns";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Messages() {
   const location = useLocation();
@@ -21,23 +21,31 @@ function Messages() {
   const [filter, setFilter] = useState(filterFromState || "all");
   const [editedText, setEditedText] = useState("");
 
+  const navigate = useNavigate();
+
   //axios
   async function getMessages() {
     const token = sessionStorage.getItem("token");
-    await axios
-      .get("http://localhost:4000/messages", {
+    if (!token) {
+      console.log("No token available");
+      return navigate("/");
+    }
+    try {
+      const res = await axios.get("http://localhost:4000/messages", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      .then((res) => {
-        sessionStorage.setItem("token", res.data.newToken);
-        setMessages(res.data.messages);
-        setPendingMessages(getFilteredmessages(res.data.messages));
-      })
-      .catch((err) => console.log(err));
+      });
+      sessionStorage.setItem("token", res.data.newToken);
+      setMessages(res.data.messages);
+      setPendingMessages(getFilteredmessages(res.data.messages));
+    } catch (err) {
+      if (err.response.status === 401) {
+        sessionStorage.removeItem("token");
+        navigate("/");
+      }
+    }
   }
-
   useEffect(() => {
     getMessages();
   }, []);
@@ -87,6 +95,11 @@ function Messages() {
 
   async function handleMessage(message, action) {
     const token = sessionStorage.getItem("token");
+    if (!token) {
+      console.log("No token available");
+      return navigate("/");
+    }
+
     let newMessage = {
       id: message.id,
       status: action === "approve" ? "approved" : "denied",
@@ -120,12 +133,19 @@ function Messages() {
       setPreviousMessage(message);
       setEditing(false);
     } catch (error) {
-      console.log(error);
+      if (err.response.status === 401) {
+        sessionStorage.removeItem("token");
+        navigate("/");
+      }
     }
   }
 
   async function handleRegretStatus() {
     const token = sessionStorage.getItem("token");
+    if (!token) {
+      console.log("No token available");
+      return navigate("/");
+    }
     try {
       const response = await axios.patch(
         "http://localhost:4000/messages",
@@ -138,7 +158,10 @@ function Messages() {
       getMessages();
       setSelectedMessage(previousMessage);
     } catch (err) {
-      console.log(err);
+      if (err.response.status === 401) {
+        sessionStorage.removeItem("token");
+        navigate("/");
+      }
     }
   }
 

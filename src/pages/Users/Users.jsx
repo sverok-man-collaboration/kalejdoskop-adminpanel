@@ -27,49 +27,59 @@ function Users() {
 
   async function getUsers() {
     const token = sessionStorage.getItem("token");
-    await axios
-      .get("http://localhost:4000/users", {
+    if (!token) {
+      console.log("No token available");
+      return navigate("/");
+    }
+    try {
+      const res = await axios.get("http://localhost:4000/users", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      .then((res) => {
-        sessionStorage.setItem("token", res.data.newToken);
-        setUsers(res.data.users);
-      })
-      .catch((err) => console.log(err));
+      });
+      sessionStorage.setItem("token", res.data.newToken);
+      setUsers(res.data.users);
+    } catch (err) {
+      if (err.response.status === 401) {
+        sessionStorage.removeItem("token");
+        navigate("/");
+      }
+    }
   }
   useEffect(() => {
     getUsers();
   }, []);
 
   async function addUser() {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      console.log("No token available");
+      return navigate("/");
+    }
     try {
-      const token = sessionStorage.getItem("token");
-      if (token) {
-        const res = await axios.post(
-          "http://localhost:4000/users",
-          {
-            email: newEmail,
-            name: newUser,
+      const res = await axios.post(
+        "http://localhost:4000/users",
+        {
+          email: newEmail,
+          name: newUser,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        sessionStorage.setItem("token", res.data.newToken);
-        setModal(true);
-        setModalMessage(`${newUser} har lagts till!`);
-        setNewEmail("");
-        setNewUser("");
-        getUsers();
-      } else {
-        console.log("No token available");
-        navigate("/");
-      }
+        }
+      );
+      sessionStorage.setItem("token", res.data.newToken);
+      setModal(true);
+      setModalMessage(`${newUser} har lagts till!`);
+      setNewEmail("");
+      setNewUser("");
+      getUsers();
     } catch (err) {
+      if (err.response.status === 401) {
+        sessionStorage.removeItem("token");
+        return navigate("/");
+      }
       console.log(err.message);
       setModal(true);
       setModalMessage(`${newUser} har inte lagts till! Försök igen`);
@@ -85,22 +95,25 @@ function Users() {
   }
 
   async function deleteUser() {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      console.log("No token available");
+      return navigate("/");
+    }
     try {
-      const token = sessionStorage.getItem("token");
-      if (token) {
-        await axios.delete(`http://localhost:4000/users/${deleteId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setModalMessage(`${deleteEmail} har taggits bort!`);
-        setDeleteUserButton(false);
-        getUsers();
-      } else {
-        console.log("No token available");
-        navigate("/");
-      }
+      await axios.delete(`http://localhost:4000/users/${deleteId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setModalMessage(`${deleteEmail} har taggits bort!`);
+      setDeleteUserButton(false);
+      getUsers();
     } catch (err) {
+      if (err.response.status === 401) {
+        sessionStorage.removeItem("token");
+        return navigate("/");
+      }
       console.log(err.message);
       setModalMessage(`${deleteEmail} har inte taggits bort! Försök igen`);
     }
