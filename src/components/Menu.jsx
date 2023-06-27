@@ -110,7 +110,10 @@ function Menu() {
           className="mb-6 mt-auto mx-auto w-40"
         >
           <Link to="/" className="w-full">
-            <button className=" w-full transform bg-accent transition duration-500 rounded-md text-white p-2 hover:bg-accentHover">
+            <button
+              onClick={removeToken}
+              className=" w-full transform bg-accent transition duration-500 rounded-md text-white p-2 hover:bg-accentHover"
+            >
               Logga ut
             </button>
           </Link>

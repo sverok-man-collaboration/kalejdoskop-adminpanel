@@ -43,6 +43,9 @@ function Users() {
       if (err.response.status === 401) {
         sessionStorage.removeItem("token");
         navigate("/");
+      } else if (err.response.status === 500) {
+        // Create a request button and message
+        console.log(err.message);
       }
     }
   }
@@ -79,8 +82,11 @@ function Users() {
       if (err.response.status === 401) {
         sessionStorage.removeItem("token");
         return navigate("/");
+      } else if (err.response.status === 500) {
+        setModalMessage(
+          `Tyvärr kunde ${newUser} inte läggas till på grund av ett serverproblem! Försök igen`
+        );
       }
-      console.log(err.message);
       setModal(true);
       setModalMessage(`${newUser} har inte lagts till! Försök igen`);
     }
@@ -113,8 +119,11 @@ function Users() {
       if (err.response.status === 401) {
         sessionStorage.removeItem("token");
         return navigate("/");
+      } else if (err.response.status === 500) {
+        setModalMessage(
+          `Tyvärr har inte ${deleteEmail} taggits bort på grund av ett serverproblem! Försök igen`
+        );
       }
-      console.log(err.message);
       setModalMessage(`${deleteEmail} har inte taggits bort! Försök igen`);
     }
   }

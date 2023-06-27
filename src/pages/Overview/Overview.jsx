@@ -39,6 +39,9 @@ function Overview() {
       if (err.response.status === 401) {
         sessionStorage.removeItem("token");
         navigate("/");
+      } else if (err.response.status === 500) {
+        // Create a request button and message
+        console.log(err.message);
       }
     }
   }
