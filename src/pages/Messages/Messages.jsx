@@ -31,7 +31,8 @@ function Messages() {
       return navigate("/");
     }
     try {
-      const res = await axios.get("http://localhost:4000/messages", {
+      const URL = process.env["API_URL"];
+      const res = await axios.get(`${URL}/messages`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

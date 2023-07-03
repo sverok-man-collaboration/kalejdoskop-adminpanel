@@ -32,7 +32,8 @@ function Users() {
       return navigate("/");
     }
     try {
-      const res = await axios.get("http://localhost:4000/users", {
+      const URL = process.env["API_URL"];
+      const res = await axios.get(`${URL}/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -60,8 +61,9 @@ function Users() {
       return navigate("/");
     }
     try {
+      const URL = process.env["API_URL"];
       const res = await axios.post(
-        "http://localhost:4000/users",
+        `${URL}/users`,
         {
           email: newEmail,
           name: newUser,
@@ -107,7 +109,8 @@ function Users() {
       return navigate("/");
     }
     try {
-      await axios.delete(`http://localhost:4000/users/${deleteId}`, {
+      const URL = process.env["API_URL"];
+      await axios.delete(`${URL}/users/${deleteId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

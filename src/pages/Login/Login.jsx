@@ -7,7 +7,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [loginStatus, setLoginStatus] = useState(0);
   const [loginResponse, setLoginResponse] = useState("");
-  
+
   const navigate = useNavigate();
 
   async function fetchToken() {
@@ -29,7 +29,8 @@ function Login() {
 
   async function loginRequest(email) {
     try {
-      const response = await axios.post("http://localhost:4000/login/auth", {
+      const URL = process.env["API_URL"];
+      const response = await axios.post(`${URL}/login/auth`, {
         email: email,
       });
       setLoginStatus(response.status);
