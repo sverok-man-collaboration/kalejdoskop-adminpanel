@@ -1,6 +1,5 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +11,8 @@ function Overview() {
   const [pendingMessages, setPendingMessages] = useState([]);
   const [approvedMessages, setApprovedMessages] = useState([]);
 
+  const navigate = useNavigate();
+
   function filterMessages(data) {
     const pending = data.filter((message) => message.status === "pending");
     setPendingMessages(pending);
@@ -21,24 +22,33 @@ function Overview() {
 
   async function getMessages() {
     const token = sessionStorage.getItem("token");
-    await axios
-      .get("http://localhost:4000/messages", {
+    if (!token) {
+      console.log("No token available");
+      return navigate("/");
+    }
+    try {
+      const URL = process.env["API_URL"];
+      const res = await axios.get(`${URL}/messages`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      .then((res) => {
-        sessionStorage.setItem("token", res.data.newToken);
-        setMessages(res.data.messages);
-        filterMessages(res.data.messages);
-      })
-      .catch((err) => console.log(err));
+      });
+      sessionStorage.setItem("token", res.data.newToken);
+      setMessages(res.data.messages);
+      filterMessages(res.data.messages);
+    } catch (err) {
+      if (err.response.status === 401) {
+        sessionStorage.removeItem("token");
+        navigate("/");
+      } else if (err.response.status === 500) {
+        // Create a request button and message
+        console.log(err.message);
+      }
+    }
   }
   useEffect(() => {
     getMessages();
   }, []);
-
-  const navigate = useNavigate();
 
   const handleClick = (filterValue) => {
     navigate("/messages", { state: { filter: filterValue } });
