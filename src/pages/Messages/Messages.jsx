@@ -37,7 +37,7 @@ function Messages() {
       return navigate("/");
     }
     try {
-      const URL = process.env["API_URL"];
+      const URL = import.meta.env.VITE_API_URL;
       const res = await axios.get(`${URL}/messages`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -118,13 +118,10 @@ function Messages() {
     };
 
     try {
-      const response = await axios.patch(
-        "http://localhost:4000/messages",
-        newMessage,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const URL = import.meta.env.VITE_API_URL;
+      const response = await axios.patch(`${URL}/messages`, newMessage, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       sessionStorage.setItem("token", response.data.newToken);
       getMessages();
       confetti({
@@ -162,13 +159,10 @@ function Messages() {
       return navigate("/");
     }
     try {
-      const response = await axios.patch(
-        "http://localhost:4000/messages",
-        previousMessage,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const URL = import.meta.env.VITE_API_URL;
+      const response = await axios.patch(`${URL}/messages`, previousMessage, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       sessionStorage.setItem("token", response.data.newToken);
       getMessages();
       setSelectedMessage(previousMessage);
