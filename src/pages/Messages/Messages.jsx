@@ -14,6 +14,7 @@ function Messages() {
   const [showApprove, setShowApprove] = useState(false);
   const [showDeny, setShowDeny] = useState(false);
   const [editing, setEditing] = useState(false);
+
   const [messages, setMessages] = useState([]);
   const [pendingMessages, setPendingMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -22,6 +23,11 @@ function Messages() {
   const [editedText, setEditedText] = useState("");
 
   const navigate = useNavigate();
+
+  //500 error
+  const [handleMessage500Error, setHandleMessage500Error] = useState(false);
+  const [getMessages500Error, setGetMessages500Error] = useState(false);
+  const [handleRegretStatus500Error, setHandleRegretStatus500Error] = useState(false);
 
   //axios
   async function getMessages() {
@@ -46,6 +52,7 @@ function Messages() {
         navigate("/");
       } else if (err.response.status === 500) {
         // Create a request button and message
+        setGetMessages500Error(true)
         console.log(err.message);
       }
     }
@@ -142,6 +149,7 @@ function Messages() {
         navigate("/");
       } else if (err.response.status === 500) {
         // Create a request button and message
+        setHandleMessage500Error(true)
         console.log(err.message);
       }
     }
@@ -170,6 +178,7 @@ function Messages() {
         navigate("/");
       } else if (err.response.status === 500) {
         // Create a request button and message
+        setHandleRegretStatus500Error(true)
         console.log(err.message);
       }
     }
@@ -484,6 +493,9 @@ function Messages() {
               </div>
             </div>
           ) : null}
+          {handleMessage500Error && <div><p>Ett serverfel har inträffat. <span onClick={handleMessage()}>Försök igen</span></p></div>}
+          {handleRegretStatus500Error && <div><p>Ett serverfel har inträffat. <span onClick={handleRegretStatus()}>Försök igen</span></p></div>}
+          {getMessages500Error && <div><p>Ett serverfel har inträffat. <span onClick={getMessages()}>Försök igen</span></p></div>}
         </div>
       </div>
     </div>
