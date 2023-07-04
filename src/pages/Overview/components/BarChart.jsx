@@ -1,7 +1,7 @@
 import { Chart } from "chart.js/auto";
 import { useEffect } from "react";
 
-function BarChart() {
+function BarChart({ downloads }) {
   useEffect(() => {
     const today = new Date();
     const week = [];

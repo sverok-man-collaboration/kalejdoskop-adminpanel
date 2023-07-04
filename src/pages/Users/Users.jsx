@@ -32,7 +32,7 @@ function Users() {
       return navigate("/");
     }
     try {
-      const URL = process.env["API_URL"];
+      const URL = import.meta.env.VITE_API_URL;
       const res = await axios.get(`${URL}/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -61,7 +61,7 @@ function Users() {
       return navigate("/");
     }
     try {
-      const URL = process.env["API_URL"];
+      const URL = import.meta.env.VITE_API_URL;
       const res = await axios.post(
         `${URL}/users`,
         {
@@ -109,7 +109,7 @@ function Users() {
       return navigate("/");
     }
     try {
-      const URL = process.env["API_URL"];
+      const URL = import.meta.env.VITE_API_URL;
       await axios.delete(`${URL}/users/${deleteId}`, {
         headers: {
           Authorization: `Bearer ${token}`,

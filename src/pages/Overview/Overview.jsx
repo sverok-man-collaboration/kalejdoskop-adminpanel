@@ -10,6 +10,7 @@ function Overview() {
   const [messages, setMessages] = useState([]);
   const [pendingMessages, setPendingMessages] = useState([]);
   const [approvedMessages, setApprovedMessages] = useState([]);
+  const [downloads, setDownloads] = useState([]);
 
   const navigate = useNavigate();
 
@@ -27,7 +28,7 @@ function Overview() {
       return navigate("/");
     }
     try {
-      const URL = process.env["API_URL"];
+      const URL = import.meta.env.VITE_API_URL;
       const res = await axios.get(`${URL}/messages`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -46,8 +47,23 @@ function Overview() {
       }
     }
   }
+
+  async function getDownloads() {
+    try {
+      const URL = import.meta.env.VITE_API_URL;
+      const res = await axios.get(`${URL}/statistics/downloads`);
+      setDownloads(res.data);
+    } catch (err) {
+      if (err.response.status === 500) {
+        // Create a request button and message
+        console.log(err.message);
+      }
+    }
+  }
+
   useEffect(() => {
     getMessages();
+    getDownloads();
   }, []);
 
   const handleClick = (filterValue) => {
@@ -93,7 +109,7 @@ function Overview() {
           </div>
           <div className="flex justify-center">
             <div className="w-[240px] md:w-[580px] mt-10 sm:mt-20 mx-[8px]">
-              <BarChart />
+              <BarChart downloads={downloads} />
             </div>
           </div>
         </div>
