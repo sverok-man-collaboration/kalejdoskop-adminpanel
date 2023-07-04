@@ -27,7 +27,7 @@ function Overview() {
       return navigate("/");
     }
     try {
-      const URL = process.env["API_URL"];
+      const URL = import.meta.env.VITE_API_URL;
       const res = await axios.get(`${URL}/messages`, {
         headers: {
           Authorization: `Bearer ${token}`,

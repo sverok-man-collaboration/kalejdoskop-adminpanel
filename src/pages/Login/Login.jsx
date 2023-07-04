@@ -29,7 +29,7 @@ function Login() {
 
   async function loginRequest(email) {
     try {
-      const URL = process.env["API_URL"];
+      const URL = import.meta.env.VITE_API_URL;
       const response = await axios.post(`${URL}/login/auth`, {
         email: email,
       });
