@@ -118,7 +118,7 @@ function Users() {
           <h1 className="ml-4 mb-4 text-lg">Användare</h1>
 
           {addUserModal ? (
-            <div className="z-50 fixed top-0 left-0 bottom-0 right-0  pt-24 md:py-4 px-4 md:mb-8 md:px-4 md:ml-4 bg-secondary md:max-w-[50%] lg:max-w-[30%] rounded-md">
+            <div className="z-50 fixed top-0 md:top-10 left-0 md:left-[210px] bottom-0 right-0  pt-24 md:py-4 px-4 md:mb-8 md:px-4  bg-secondary md:w-[50%] lg:w-[30%] rounded-md">
               <div className="text-right w-[80%] sm:w-[60%] md:w-full mx-auto">
                 <button
                   className="p-2 bg-accent rounded-md text-white text-sm"
@@ -180,7 +180,7 @@ function Users() {
           )}
 
           {modal ? (
-            <div className="z-50 fixed top-0 left-0 bottom-0 right-0 pt-24 px-4 bg-white bg-opacity-30 backdrop-filter backdrop-blur">
+            <div className="z-50 fixed top-0 left-2 bottom-0 right-0 pt-24 px-4 bg-white bg-opacity-30 backdrop-filter backdrop-blur">
               <div className="w-[90%] sm:w-[60%] md:w-[50%] h-[50%] mx-auto bg-secondary p-4 rounded-md">
                 <button
                   className="p-2 bg-accent rounded-md text-white text-sm ml-auto block"
