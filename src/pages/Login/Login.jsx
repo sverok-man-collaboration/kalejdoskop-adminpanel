@@ -8,6 +8,13 @@ function Login() {
   const [loginStatus, setLoginStatus] = useState(0);
   const [loginResponse, setLoginResponse] = useState("");
 
+  const [cookieConsent, setCookieConsent] = useState(false);
+  const [formError, setFormError] = useState("");
+
+  const handleCheckboxChange = () => {
+    setCookieConsent(!cookieConsent);
+  };
+
   const navigate = useNavigate();
 
   async function fetchToken() {
@@ -44,8 +51,20 @@ function Login() {
     setEmail(e.target.value);
   }
 
+  function handleChange(e) {
+    setEmail(e.target.value);
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
+
+    if (!email || !cookieConsent) {
+      setFormError(
+        "Du måste fylla i e-mail och godkänna kakor för att kunna logga in."
+      );
+      return;
+    }
+
     loginRequest(email);
     setEmail("");
   }
@@ -71,16 +90,28 @@ function Login() {
                   value={email}
                   className="border-b border-primary sm:text-sm p-2 "
                   placeholder="email@example.se"
+                  required
                 />
+                <label className="text-sm after:content-['*'] mt-10">
+                  <input
+                    type="checkbox"
+                    checked={cookieConsent}
+                    onChange={handleCheckboxChange}
+                    required
+                  />{" "}
+                  Jag godkänner att mina kakor sparas.
+                </label>
+                {formError && <p className="mt-2">{formError}</p>}
                 <button
-                  disabled={!email}
+                  disabled={!email && !cookieConsent}
                   type="submit"
                   onClick={handleSubmit}
-                  className="transform bg-accent transition duration-500 rounded-md mt-10 text-white p-2 hover:bg-accentHover mb-4"
+                  className="transform bg-accent transition duration-500 rounded-md mt-4 text-white p-2 hover:bg-accentHover mb-4"
                 >
                   Logga in
                 </button>
               </form>
+
               {loginResponse === "Try again" ? (
                 <small>Något gick fel försök igen.</small>
               ) : (
