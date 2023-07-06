@@ -1,33 +1,71 @@
 import { Chart } from "chart.js/auto";
 import { useEffect } from "react";
+import axios from "axios";
 
-function BarChart({ downloads }) {
+const months = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function BarChart() {
+  async function getDownloads() {
+    try {
+      const URL = import.meta.env.VITE_API_URL;
+      const res = await axios.get(`${URL}/statistics/downloads`);
+      renderChart(res.data);
+    } catch (err) {
+      if (err.response.status === 500) {
+        // Create a request button and message
+        console.log(err.message);
+      }
+    }
+  }
+
   useEffect(() => {
-    const today = new Date();
-    const week = [];
+    getDownloads();
+  });
 
-    for (let i = 1; i < 7; i++) {
-      const priorDay = new Date(new Date().setDate(today.getDate() - i));
-      week.push(priorDay);
+  function renderChart(data) {
+    const statistics = [];
+    const chartStatistics = [];
+
+    for (let i = 0; i < data.length; i++) {
+      const month = new Date(data[i].timestamp).getMonth();
+      const day = new Date(data[i].timestamp).getDate();
+      statistics.push({ id: i, month: months[month], day: day });
     }
 
-    const data = [
-      { day: week[5].toUTCString().slice(5, 11), downloads: 70 },
-      { day: week[4].toUTCString().slice(5, 11), downloads: 40 },
-      { day: week[3].toUTCString().slice(5, 11), downloads: 80 },
-      { day: week[2].toUTCString().slice(5, 11), downloads: 10 },
-      { day: week[1].toUTCString().slice(5, 11), downloads: 20 },
-      { day: week[0].toUTCString().slice(5, 11), downloads: 20 },
-      { day: today.toUTCString().slice(5, 11), downloads: 50 },
-    ];
+    const today = new Date();
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(new Date().setDate(today.getDate() - i));
+      const day = date.getDate();
+      const month = date.getMonth();
+      const remainingDownloads = statistics.filter(
+        (date) => date.day === day && date.month === months[month]
+      );
+      chartStatistics.push({
+        day: `${day} ${months[month]}`,
+        downloads: remainingDownloads.length,
+      });
+    }
 
     const context = document.getElementById("bar-chart");
 
     new Chart(context, {
       type: "bar",
-      options: { maintainAspectRatio: false },
       data: {
-        labels: data.map((row) => row.day),
+        labels: chartStatistics.map((row) => row.day),
         datasets: [
           {
             backgroundColor: [
@@ -39,13 +77,33 @@ function BarChart({ downloads }) {
               "#5FF78A",
               "#02CC3B",
             ],
-            label: "Antal nedladdningar senaste veckan",
-            data: data.map((row) => row.downloads),
+            label: "Nedladdnings försök av Kalejdoskop",
+            data: chartStatistics.map((row) => row.downloads),
           },
         ],
       },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: "Antal nedladdnings försök de senaste 7 dagarna",
+          },
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+            },
+          },
+        },
+      },
     });
-  }, []);
+  }
 
   return (
     <div className="w-full">
